@@ -13,6 +13,22 @@ spring:
       ddl-auto: validate
     show-sql: true
 
+  # LDAP Configuration
+  ldap:
+    urls: ldap://localhost:389
+    base: dc=cpm,dc=org
+    username: cn=admin,dc=cpm,dc=org
+    password: admin
+
+  # Security Configuration
+  security:
+    ldap:
+
+      user-search-base: ou=users
+      user-search-filter: (uid={0})
+      group-search-base: ou=users
+      group-role-attribute: description
+
 # Swagger Configuration
 springdoc:
   swagger-ui:

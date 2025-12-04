@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   # Data Base
   postgres:
@@ -28,8 +30,29 @@ services:
     networks:
       - cpm-network
 
+  # OpenLDAP (User Directory)
+  openldap:
+    image: osixia/openldap:1.5.0
+    container_name: cpm-openldap
+    ports:
+      - "389:389"
+      - "636:636"
+    volumes:
+
+      - ./infra/ldap/ldap-data.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/ldap-data.ldif
+      - ldap_data:/var/lib/ldap
+    environment:
+      LDAP_ORGANISATION: "Cloud Provisioning Manager"
+      LDAP_DOMAIN: "cpm.org"
+      LDAP_ADMIN_PASSWORD: "admin"
+    networks:
+      - cpm-network
+
+
+# Global Keys
 volumes:
   postgres_data:
+  ldap_data:
 
 networks:
   cpm-network:

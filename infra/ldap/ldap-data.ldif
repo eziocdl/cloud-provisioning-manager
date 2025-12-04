@@ -1,0 +1,54 @@
+# Domain Name
+dn: dc=cpm,dc=org
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: Cloud Provisioning Manager
+
+# User Group (Organization Unit)
+dn: ou=users,dc=cpm,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: Users
+
+# User 1: ADMIN
+dn: uid=admin,ou=users,dc=cpm,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Administrator User
+sn: Admin
+mail: admin@cpm.org
+uid: admin
+userPassword: senhaadmin123
+description: ADMIN
+title: ADMIN
+
+# User 2: DEVELOPER
+dn: uid=devuser,ou=users,dc=cpm,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Developer User
+sn: Dev
+mail: devuser@cpm.org
+uid: devuser
+userPassword: senhadev123
+description: DEV
+title: DEV
+
+# User 3: TRAINEE
+dn: uid=trainee,ou=users,dc=cpm,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Trainee User
+sn: Trainee
+mail: trainee@cpm.org
+uid: trainee
+userPassword: senhatrainee123
+description: TRAINEE
+title: TRAINEE

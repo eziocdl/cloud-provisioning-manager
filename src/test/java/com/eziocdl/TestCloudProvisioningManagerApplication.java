@@ -1,4 +1,4 @@
-package com.eziocdl.cpm;
+package com.eziocdl;
 
 import org.springframework.boot.SpringApplication;
 

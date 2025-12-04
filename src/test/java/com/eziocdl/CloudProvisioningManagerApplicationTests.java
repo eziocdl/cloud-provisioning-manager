@@ -1,4 +1,4 @@
-package com.eziocdl.cpm;
+package com.eziocdl;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
