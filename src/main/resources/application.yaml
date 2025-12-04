@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: cloud-provisioning-manager
+
+  # Data Base Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cpm_db
+    username: cpm_user
+    password: cpm_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+# Swagger Configuration
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+server:
+  port: 8080

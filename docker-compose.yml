@@ -1,0 +1,36 @@
+services:
+  # Data Base
+  postgres:
+    image: postgres:16-alpine
+    container_name: cpm-postgres
+    environment:
+      POSTGRES_DB: cpm_db
+      POSTGRES_USER: cpm_user
+      POSTGRES_PASSWORD: cpm_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cpm-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cpm_user -d cpm_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Observability (Distributed Tracing)
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: cpm-zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - cpm-network
+
+volumes:
+  postgres_data:
+
+networks:
+  cpm-network:
+    driver: bridge
