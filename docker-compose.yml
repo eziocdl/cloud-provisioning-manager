@@ -34,6 +34,9 @@ services:
   openldap:
     image: osixia/openldap:1.5.0
     container_name: cpm-openldap
+
+    command: --copy-service
+    # ---------------------
     ports:
       - "389:389"
       - "636:636"
@@ -47,7 +50,6 @@ services:
       LDAP_ADMIN_PASSWORD: "admin"
     networks:
       - cpm-network
-
 
 # Global Keys
 volumes:
