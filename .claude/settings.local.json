@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/eziolima/intellij/cloud-provisioning-manager log --oneline -20)",
+      "Bash(git -C /Users/eziolima/intellij/cloud-provisioning-manager log --format='%H %s' -10)",
+      "Bash(git -C /Users/eziolima/intellij/cloud-provisioning-manager show 7c45471 --name-status)",
+      "Bash(git -C /Users/eziolima/intellij/cloud-provisioning-manager show 7c45471 --stat)",
+      "Bash(git -C /Users/eziolima/intellij/cloud-provisioning-manager log --all --oneline)",
+      "Bash(git -C /Users/eziolima/intellij/cloud-provisioning-manager log --all --grep=\"Epic\\|Story\\|Task\" --oneline)",
+      "WebSearch",
+      "WebFetch(domain:github.com)"
+    ]
+  }
+}

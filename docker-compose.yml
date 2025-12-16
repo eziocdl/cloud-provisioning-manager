@@ -34,20 +34,27 @@ services:
   openldap:
     image: osixia/openldap:1.5.0
     container_name: cpm-openldap
-
     command: --copy-service
-    # ---------------------
     ports:
       - "389:389"
       - "636:636"
     volumes:
-
       - ./infra/ldap/ldap-data.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/ldap-data.ldif
       - ldap_data:/var/lib/ldap
     environment:
       LDAP_ORGANISATION: "Cloud Provisioning Manager"
       LDAP_DOMAIN: "cpm.org"
       LDAP_ADMIN_PASSWORD: "admin"
+    networks:
+      - cpm-network
+
+  # --- NOVO: WireMock (Simula o OpenStack) ---
+  wiremock:
+    image: wiremock/wiremock:2.35.0
+    container_name: cpm-wiremock
+    ports:
+      - "8081:8080" # Mapeia a porta 8080 do container para a 8081 do seu Mac
+    command: --verbose --global-response-templating
     networks:
       - cpm-network
 
