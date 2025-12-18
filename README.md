@@ -264,9 +264,7 @@ MIT License - Ezio Lima
 
 ### Swagger UI
 
-https://github.com/eziocdl/cloud-provisioning-manager/raw/main/docs/assets/videos/swagger-demo.mp4
-
-[Click here to watch the Swagger UI demo](docs/assets/videos/swagger-demo.mp4)
+[Download Swagger UI Demo Video](https://github.com/eziocdl/cloud-provisioning-manager/raw/main/docs/assets/videos/swagger-demo.mp4)
 
 ### Zipkin Distributed Tracing
 
