@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### AI Tools ###
+.claude/
+
+### NPM Cache ###
+.npm-cache/

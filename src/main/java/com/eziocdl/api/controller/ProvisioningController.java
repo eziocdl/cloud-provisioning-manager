@@ -30,6 +30,7 @@ public class ProvisioningController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Solicitação aceita e persistida."),
             @ApiResponse(responseCode = "400", description = "Falha na validação do contrato de entrada."),
+            @ApiResponse(responseCode = "403", description = "Violação de política de governança. Recursos solicitados excedem a cota do usuário."),
             @ApiResponse(responseCode = "500", description = "Erro interno no processamento da solicitação.")
     })
     @PostMapping

@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cpm-config
+  labels:
+    app: cpm
+    tier: backend
+data:
+  # Application Settings
+  SPRING_APPLICATION_NAME: "cloud-provisioning-manager"
+  SERVER_PORT: "8080"
+
+  # Database Configuration
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-service:5432/cpm_db"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "validate"
+  SPRING_JPA_SHOW_SQL: "false"
+
+  # LDAP Configuration
+  SPRING_LDAP_URLS: "ldap://openldap-service:389"
+  SPRING_LDAP_BASE: "dc=cpm,dc=org"
+
+  # Observability - Zipkin
+  MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: "http://zipkin-service:9411/api/v2/spans"
+  MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "1.0"
+
+  # Actuator Endpoints
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
+
+  # Resilience4j - Circuit Breaker
+  RESILIENCE4J_CIRCUITBREAKER_INSTANCES_OPENSTACK_FAILURE_RATE_THRESHOLD: "50"
+  RESILIENCE4J_CIRCUITBREAKER_INSTANCES_OPENSTACK_WAIT_DURATION_IN_OPEN_STATE: "5s"
+  RESILIENCE4J_CIRCUITBREAKER_INSTANCES_OPENSTACK_SLIDING_WINDOW_SIZE: "5"
+
+  # Cloud Provider (OpenStack Mock)
+  CLOUD_PROVIDER_URL: "http://wiremock-service:8080"

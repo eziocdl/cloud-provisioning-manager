@@ -36,3 +36,23 @@ springdoc:
 
 server:
   port: 8080
+
+# Distributed Tracing - Zipkin
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+
+# Debug logging para tracing (remover em produção)
+logging:
+  level:
+    io.micrometer.tracing: DEBUG
+    zipkin2.reporter: DEBUG

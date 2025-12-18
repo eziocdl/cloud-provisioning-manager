@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.ldap.authentication.BindAuthenticator;
 import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
-import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -21,34 +20,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**", "/actuator/**").permitAll()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
-
                 .httpBasic(httpBasic -> httpBasic.realmName("Cloud Provisioning Manager API"))
                 .build();
     }
 
-    // O Bean do LdapAuthenticationProvider que será injetado
     @Bean
-    public LdapAuthenticationProvider ldapAuthenticationProvider(LdapContextSource contextSource) {
-
+    public LdapAuthenticationProvider ldapAuthenticationProvider(
+            LdapContextSource contextSource,
+            LdapAuthoritiesPopulator authoritiesPopulator) {
 
         BindAuthenticator bindAuthenticator = new BindAuthenticator(contextSource);
-
-
-        LdapAuthoritiesPopulator authoritiesPopulator = new DefaultLdapAuthoritiesPopulator(contextSource, "ou=users");
-
-
-        ((DefaultLdapAuthoritiesPopulator) authoritiesPopulator).setGroupRoleAttribute("description");
-
-        ((DefaultLdapAuthoritiesPopulator) authoritiesPopulator).setRolePrefix("");
-
+        // Pattern para encontrar o usuario no LDAP
+        bindAuthenticator.setUserDnPatterns(new String[]{"uid={0},ou=users"});
 
         return new LdapAuthenticationProvider(bindAuthenticator, authoritiesPopulator);
     }

@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: cloud-provisioning-manager-test
+
+  # Disable LDAP for tests (use @WithMockUser instead)
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.ldap.LdapAutoConfiguration
+
+  # Use Testcontainers PostgreSQL (configured via @ServiceConnection)
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  # Disable Flyway for tests (let Hibernate create schema)
+  flyway:
+    enabled: false
+
+# Disable tracing in tests
+management:
+  tracing:
+    enabled: false
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+# Resilience4j - faster timeouts for tests
+resilience4j:
+  circuitbreaker:
+    instances:
+      openstack:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 1s
+        sliding-window-size: 3
