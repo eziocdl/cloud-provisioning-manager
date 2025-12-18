@@ -10,212 +10,115 @@
 [![CI](https://github.com/eziocdl/cloud-provisioning-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/eziocdl/cloud-provisioning-manager/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/eziocdl/cloud-provisioning-manager/branch/main/graph/badge.svg)](https://codecov.io/gh/eziocdl/cloud-provisioning-manager)
 
-> API de Governanca e Orquestracao para provisionamento de infraestrutura em nuvem.
+> Governance and Orchestration API for cloud infrastructure provisioning.
 
 ---
 
 ## Highlights
 
-| Feature | Descricao |
-|---------|-----------|
-| **Clean Architecture** | Separacao clara de responsabilidades com Ports & Adapters |
+| Feature | Description |
+|---------|-------------|
+| **Clean Architecture** | Clear separation of concerns with Ports & Adapters |
 | **Domain-Driven Design** | Aggregates, Value Objects, Domain Events, Domain Services |
-| **Circuit Breaker** | Resiliencia com fallback automatico via Resilience4j |
-| **Distributed Tracing** | Observabilidade end-to-end com Zipkin |
-| **LDAP Auth** | Autenticacao corporativa com roles (TRAINEE, DEV, ADMIN) |
+| **Circuit Breaker** | Resilience with automatic fallback via Resilience4j |
+| **Distributed Tracing** | End-to-end observability with Zipkin |
+| **LDAP Auth** | Corporate authentication with roles (TRAINEE, DEV, ADMIN) |
 | **Kubernetes Ready** | Deployment, Service, ConfigMap, Secrets |
-| **Architecture Tests** | Validacao automatica com ArchUnit |
-| **Code Coverage** | Relatorios JaCoCo integrados ao CI |
+| **Architecture Tests** | Automated validation with ArchUnit |
+| **Code Coverage** | JaCoCo reports integrated with CI |
 
 ---
 
-## O Problema
+## The Problem
 
-Grandes empresas sofrem com **Shadow IT** e descontrole financeiro na nuvem. Desenvolvedores criam VMs sem padronizacao, sem etiquetas de custo e sem aprovacao, gerando faturas milionarias e brechas de seguranca.
+Large enterprises suffer from **Shadow IT** and financial chaos in the cloud. Developers create VMs without standardization, without cost tags, and without approval, generating million-dollar bills and security breaches.
 
-## A Solucao
+## The Solution
 
-O CPM atua como um **Gateway Inteligente** entre o desenvolvedor e a infraestrutura (OpenStack):
+CPM acts as an **Intelligent Gateway** between developers and infrastructure (OpenStack):
 
-1. **Blindagem de Seguranca**: Acesso via LDAP corporativo
-2. **Governanca Ativa**: Regras de negocio por cargo (ex: "Trainee so cria VM pequena")
-3. **Resiliencia**: Circuit Breaker para tolerancia a falhas
-4. **Observabilidade**: Distributed Tracing com Zipkin
+1. **Security Shield**: Access via corporate LDAP
+2. **Active Governance**: Business rules by role (e.g., "Trainee can only create small VMs")
+3. **Resilience**: Circuit Breaker for fault tolerance
+4. **Observability**: Distributed Tracing with Zipkin
 
 ---
 
-## Arquitetura C4
+## C4 Architecture
 
 ### Context Diagram
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         CLOUD PROVISIONING MANAGER                   │
-│                                                                      │
-│    ┌──────────┐         ┌─────────────────┐         ┌──────────┐   │
-│    │          │         │                 │         │          │   │
-│    │ Developer├────────►│   CPM API       ├────────►│ OpenStack│   │
-│    │          │  REST   │   (Gateway)     │  HTTP   │  Cloud   │   │
-│    └──────────┘         └────────┬────────┘         └──────────┘   │
-│                                  │                                  │
-│                         ┌────────▼────────┐                        │
-│                         │                 │                        │
-│                         │   PostgreSQL    │                        │
-│                         │   (Audit Log)   │                        │
-│                         │                 │                        │
-│                         └─────────────────┘                        │
-│                                                                     │
-│    ┌──────────┐         ┌─────────────────┐                        │
-│    │          │         │                 │                        │
-│    │  LDAP    │◄────────│   Security      │                        │
-│    │ Server   │  Auth   │   Layer         │                        │
-│    │          │         │                 │                        │
-│    └──────────┘         └─────────────────┘                        │
-└─────────────────────────────────────────────────────────────────────┘
-```
+High-level view of the system showing external actors and integrations.
+
+![Context Diagram](docs/architecture/context-diagram.png)
 
 ### Container Diagram
 
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                              CPM API Container                            │
-│                                                                           │
-│  ┌─────────────┐    ┌─────────────────┐    ┌────────────────────────┐   │
-│  │             │    │                 │    │                        │   │
-│  │ REST API    │───►│ Policy          │───►│ Use Cases              │   │
-│  │ Controller  │    │ Enforcement     │    │ (Application Layer)    │   │
-│  │             │    │                 │    │                        │   │
-│  └─────────────┘    └─────────────────┘    └───────────┬────────────┘   │
-│                                                         │                │
-│                     ┌───────────────────────────────────┼────────────┐   │
-│                     │                                   │            │   │
-│              ┌──────▼──────┐    ┌──────────────┐   ┌───▼────────┐   │   │
-│              │             │    │              │   │            │   │   │
-│              │ Domain      │    │ JPA          │   │ OpenStack  │   │   │
-│              │ Model       │    │ Repository   │   │ Adapter    │   │   │
-│              │             │    │              │   │            │   │   │
-│              └─────────────┘    └──────┬───────┘   └─────┬──────┘   │   │
-│                                        │                 │          │   │
-│                                        │    Circuit      │          │   │
-│                                        │    Breaker      │          │   │
-└────────────────────────────────────────┼─────────────────┼──────────────┘
-                                         │                 │
-                                    ┌────▼────┐       ┌────▼────┐
-                                    │PostgreSQL│       │OpenStack│
-                                    └─────────┘       └─────────┘
-```
+Internal flow showing the application components and Circuit Breaker pattern.
+
+![Container Diagram](docs/architecture/container-diagram.png)
 
 ### Component Diagram (Clean Architecture)
 
-```
-┌────────────────────────────────────────────────────────────────────────────┐
-│                                API Layer                                    │
-│  ┌──────────────────────┐  ┌───────────────┐  ┌─────────────────────────┐ │
-│  │ProvisioningController│  │CreateVmRequest│  │VmStatusResponse        │ │
-│  │      (REST)          │  │    (DTO)      │  │     (DTO)              │ │
-│  └──────────┬───────────┘  └───────────────┘  └─────────────────────────┘ │
-└─────────────┼───────────────────────────────────────────────────────────────┘
-              │
-              ▼
-┌────────────────────────────────────────────────────────────────────────────┐
-│                            Application Layer                                │
-│  ┌────────────────────────┐  ┌─────────────────────────────────────────┐  │
-│  │CreateProvisioningUseCase│  │ProvisioningAsyncListener               │  │
-│  │    (Orchestrator)      │  │   (@Async @TransactionalEventListener) │  │
-│  └────────────┬───────────┘  └─────────────────────────────────────────┘  │
-│               │                                                            │
-│  ┌────────────▼───────────────────────────────────────────────────────┐   │
-│  │                         Ports (Interfaces)                          │   │
-│  │  ┌─────────────────┐  ┌──────────────────┐  ┌───────────────────┐  │   │
-│  │  │RepositoryPort   │  │ CloudProviderPort│  │ AuthenticationPort│  │   │
-│  │  └─────────────────┘  └──────────────────┘  └───────────────────┘  │   │
-│  └─────────────────────────────────────────────────────────────────────┘   │
-└────────────────────────────────────────────────────────────────────────────┘
-              │
-              ▼
-┌────────────────────────────────────────────────────────────────────────────┐
-│                              Domain Layer                                   │
-│  ┌─────────────────────────┐  ┌──────────────────┐  ┌──────────────────┐  │
-│  │   ProvisioningRequest   │  │ProvisioningStatus│  │ ResourceQuota    │  │
-│  │      (Aggregate)        │  │     (Enum)       │  │ (Value Object)   │  │
-│  └─────────────────────────┘  └──────────────────┘  └──────────────────┘  │
-│                                                                            │
-│  ┌─────────────────────────┐  ┌──────────────────────────────────────┐    │
-│  │PolicyEnforcementService │  │PolicyViolationException              │    │
-│  │    (Domain Service)     │  │   (Domain Exception)                 │    │
-│  └─────────────────────────┘  └──────────────────────────────────────┘    │
-└────────────────────────────────────────────────────────────────────────────┘
-              │
-              ▼
-┌────────────────────────────────────────────────────────────────────────────┐
-│                           Infrastructure Layer                              │
-│  ┌───────────────────┐  ┌─────────────────────┐  ┌─────────────────────┐  │
-│  │JpaProvisionRepo   │  │OpenStackAdapter     │  │LdapAuthAdapter      │  │
-│  │  (Persistence)    │  │  (Cloud Provider)   │  │  (Security)         │  │
-│  │                   │  │  + Resilience4j     │  │                     │  │
-│  └───────────────────┘  └─────────────────────┘  └─────────────────────┘  │
-│                                                                            │
-│  ┌───────────────────┐  ┌─────────────────────┐  ┌─────────────────────┐  │
-│  │SecurityConfig     │  │TracingConfig        │  │AsyncConfig          │  │
-│  └───────────────────┘  └─────────────────────┘  └─────────────────────┘  │
-└────────────────────────────────────────────────────────────────────────────┘
-```
+Detailed view of the Clean Architecture layers with Ports & Adapters pattern.
+
+![Component Diagram](docs/architecture/component-diagram.png)
 
 ---
 
-## Stack Tecnologica
+## Tech Stack
 
-| Categoria | Tecnologia |
-|-----------|------------|
+| Category | Technology |
+|----------|------------|
 | Runtime | Java 21 + Spring Boot 4.0 |
-| Persistencia | PostgreSQL + Spring Data JPA + Flyway |
-| Seguranca | Spring Security + LDAP |
-| Resiliencia | Resilience4j (Circuit Breaker) |
-| Observabilidade | Micrometer + Zipkin (Distributed Tracing) |
-| Containerizacao | Docker + Kubernetes |
-| Documentacao | OpenAPI 3.0 (Swagger) |
-| Testes | JUnit 5 + Testcontainers |
+| Persistence | PostgreSQL + Spring Data JPA + Flyway |
+| Security | Spring Security + LDAP |
+| Resilience | Resilience4j (Circuit Breaker) |
+| Observability | Micrometer + Zipkin (Distributed Tracing) |
+| Containerization | Docker + Kubernetes |
+| Documentation | OpenAPI 3.0 (Swagger) |
+| Testing | JUnit 5 + Testcontainers |
 
 ---
 
-## Como Executar
+## Getting Started
 
-### Pre-requisitos
+### Prerequisites
 
 - Java 21+
 - Docker & Docker Compose
 - Maven 3.9+
 
-### 1. Subir infraestrutura
+### 1. Start Infrastructure
 
 ```bash
 docker-compose up -d
 ```
 
-Isso inicia:
-- PostgreSQL (porta 5432)
-- OpenLDAP (porta 389)
-- Zipkin (porta 9411)
-- WireMock - Mock do OpenStack (porta 8081)
+This starts:
+- PostgreSQL (port 5432)
+- OpenLDAP (port 389)
+- Zipkin (port 9411)
+- WireMock - OpenStack Mock (port 8081)
 
-### 2. Executar a aplicacao
+### 2. Run the Application
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-### 3. Acessar
+### 3. Access
 
 - **Swagger UI**: http://localhost:8080/swagger-ui.html
 - **Zipkin**: http://localhost:9411
 
 ---
 
-## Endpoints da API
+## API Endpoints
 
 ### POST /api/v1/provisioning
 
-Cria uma solicitacao de provisionamento de VM.
+Creates a VM provisioning request.
 
 **Request:**
 ```json
@@ -251,54 +154,54 @@ Cria uma solicitacao de provisionamento de VM.
 
 ---
 
-## Politicas de Governanca
+## Governance Policies
 
-| Cargo | RAM Maximo | CPU Maximo |
-|-------|------------|------------|
+| Role | Max RAM | Max CPU |
+|------|---------|---------|
 | TRAINEE | 8GB | 4 vCPU |
 | DEV | 32GB | 8 vCPU |
-| ADMIN | Ilimitado | Ilimitado |
+| ADMIN | Unlimited | Unlimited |
 
 ---
 
-## Usuarios de Teste (LDAP)
+## Test Users (LDAP)
 
-| Usuario | Senha | Cargo |
-|---------|-------|-------|
+| Username | Password | Role |
+|----------|----------|------|
 | admin | senhaadmin123 | ADMIN |
 | devuser | senhadev123 | DEV |
 | trainee | senhatrainee123 | TRAINEE |
 
 ---
 
-## Testes
+## Testing
 
 ```bash
-# Todos os testes
+# All tests
 ./mvnw test
 
-# Apenas testes unitarios
+# Unit tests only
 ./mvnw test -Dtest=*Test
 
-# Testes de integracao (requer Docker)
-./mvnw test -Dtest=*IntegrationTest
+# Integration tests (requires Docker)
+./mvnw failsafe:integration-test failsafe:verify
 ```
 
 ---
 
-## Deploy Kubernetes
+## Kubernetes Deployment
 
 ```bash
-# Aplicar manifestos
+# Apply manifests
 kubectl apply -f k8s/
 
-# Verificar pods
+# Check pods
 kubectl get pods -l app=cpm
 ```
 
 ---
 
-## Estrutura do Projeto
+## Project Structure
 
 ```
 src/
@@ -315,23 +218,23 @@ src/
 
 ---
 
-## Documentacao
+## Documentation
 
-| Documento | Descricao |
-|-----------|-----------|
-| [C4 Diagrams](docs/architecture/C4-DIAGRAMS.md) | Diagramas de arquitetura (Context, Container, Component) |
-| [Code Review](docs/CODE-REVIEW.md) | Analise tecnica e pontos de melhoria |
-| [ADR-0001](docs/adr/0001-use-clean-architecture.md) | Por que Clean Architecture? |
-| [ADR-0002](docs/adr/0002-use-ldap-authentication.md) | Por que LDAP? |
-| [ADR-0003](docs/adr/0003-use-circuit-breaker.md) | Por que Circuit Breaker? |
-| [ADR-0004](docs/adr/0004-use-event-driven-async.md) | Por que processamento assincrono? |
-| [ADR-0005](docs/adr/0005-use-distributed-tracing.md) | Por que Distributed Tracing? |
+| Document | Description |
+|----------|-------------|
+| [C4 Diagrams](docs/architecture/C4-DIAGRAMS.md) | Architecture diagrams (Context, Container, Component) |
+| [Code Review](docs/CODE-REVIEW.md) | Technical analysis and improvement points |
+| [ADR-0001](docs/adr/0001-use-clean-architecture.md) | Why Clean Architecture? |
+| [ADR-0002](docs/adr/0002-use-ldap-authentication.md) | Why LDAP? |
+| [ADR-0003](docs/adr/0003-use-circuit-breaker.md) | Why Circuit Breaker? |
+| [ADR-0004](docs/adr/0004-use-event-driven-async.md) | Why async processing? |
+| [ADR-0005](docs/adr/0005-use-distributed-tracing.md) | Why Distributed Tracing? |
 
 ---
 
 ## CI/CD
 
-O projeto inclui um pipeline GitHub Actions completo:
+The project includes a complete GitHub Actions pipeline:
 
 ```yaml
 # .github/workflows/ci.yml
@@ -344,23 +247,27 @@ O projeto inclui um pipeline GitHub Actions completo:
 - SonarCloud Analysis
 ```
 
-Para ativar, configure os secrets no GitHub:
-- `CODECOV_TOKEN` - Para upload de cobertura
-- `DOCKER_USERNAME` / `DOCKER_PASSWORD` - Para push de imagens
-- `SONAR_TOKEN` - Para analise de qualidade
+To enable, configure secrets in GitHub:
+- `CODECOV_TOKEN` - For coverage upload
+- `DOCKER_USERNAME` / `DOCKER_PASSWORD` - For image push
+- `SONAR_TOKEN` - For quality analysis
 
 ---
 
-## Licenca
+## License
 
 MIT License - Ezio Lima
 
 ---
 
-## Screenshots
+## Demo & Screenshots
 
 ### Swagger UI
-![Swagger](docs/swagger-screenshot.png)
 
-### Zipkin Tracing
-![Zipkin](docs/zipkin-screenshot.png)
+https://github.com/eziocdl/cloud-provisioning-manager/raw/main/docs/assets/videos/swagger-demo.mp4
+
+[Click here to watch the Swagger UI demo](docs/assets/videos/swagger-demo.mp4)
+
+### Zipkin Distributed Tracing
+
+![Zipkin](docs/assets/images/zipkin-tracing.png)
